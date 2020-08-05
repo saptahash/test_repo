@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1595616668713.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "E813743E",
+    "lastKnownWriteTime" : 1596520899,
+    "last_content_update" : 1596520899,
+    "path" : "C:/Users/sapta/OneDrive/Desktop/oxcgrtRA/BSGtracker_analysis/codes/rollbackviz_fun.r",
+    "project_path" : "rollbackviz_fun.r",
+    "properties" : {
+        "cursorPosition" : "86,21",
+        "scrollLine" : "63"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

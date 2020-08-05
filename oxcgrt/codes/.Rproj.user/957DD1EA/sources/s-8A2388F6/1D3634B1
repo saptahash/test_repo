@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1595609885759.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "1D3634B1",
+    "lastKnownWriteTime" : 1596480229,
+    "last_content_update" : 1596480229390,
+    "path" : "C:/Users/sapta/OneDrive/Desktop/oxcgrtRA/BSGtracker_analysis/codes/rollback_checklist.r",
+    "project_path" : "rollback_checklist.r",
+    "properties" : {
+        "cursorPosition" : "111,0",
+        "scrollLine" : "97"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
