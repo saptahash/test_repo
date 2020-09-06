@@ -6,8 +6,18 @@ jobs:
                 name: R github actions
                 runs-on: ubuntu-latest
                 steps: 
-                        - uses: actions/checkout@v1
-                        - uses: r-lib/actions/setup-r@v1
+                        - uses: actions/checkout@master
+                        - uses: r-lib/actions/setup-r@master
                           with: 
                                   r-version: '3.5.3' # The R version to be installed 
-                        - run: Rscript -e 'print("checking if rscript is working")'
+                        - run: Rscript 'auto_test/usdata.r'
+                        - name: Commit changes
+                          run: |
+                            git config --local user.email "action@github.com"
+                            git config --local user.name "GitHub Action"
+                            git add .
+                            git diff-index --quiet HEAD || git commit -m "Push latest OxCGRT US data" -a
+                        - name: Push changes
+                          uses: ad-m/github-push-action@master
+                          with:
+                            github_token: ${{ secrets.GITHUB_TOKEN }}
