@@ -1,0 +1,13 @@
+name: An R workflow for oxcgrt US file
+on: push
+
+jobs: 
+        build:
+                name: R github actions
+                runs-on: ubuntu-latest
+                steps: 
+                        - uses: actions/checkout@v1
+                        - uses: r-lib/actions/setup-r@v1
+                          with: 
+                                  r-version: '3.5.3' # The R version to be installed 
+                        - run: Rscript -e 'print("checking if rscript is working")'
