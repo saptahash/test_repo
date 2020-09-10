@@ -15,7 +15,7 @@ jobs:
                             Rscript -e 'install.packages("here")'
                             Rscript -e 'install.packages("readr")' 
                             Rscript -e 'install.packages("haven")' 
-                            Rscript -e 'install.packages("dplyr")'
+                            Rscript -e 'install.packages("tidyverse")'
                             Rscript -e 'install.packages("countrycode")' 
                             Rscript -e 'install.packages("zoo")' 
                             Rscript -e 'install.packages("lubridate")'
