@@ -12,13 +12,13 @@ jobs:
                                   r-version: '3.5.3' # The R version to be installed 
                         - name: Install dependencies        
                           run: |
-                            install.packages("here")
-                            install.packages("readr") 
-                            install.packahes("haven") 
-                            install.packages("dplyr")
-                            install.packages("countrycode") 
-                            install.packages("zoo") 
-                            install.packages("lubridate")
+                            Rscript -e 'install.packages("here")'
+                            Rscript -e 'install.packages("readr")' 
+                            Rscript -e 'install.packages("haven")' 
+                            Rscript -e 'install.packages("dplyr")'
+                            Rscript -e 'install.packages("countrycode")' 
+                            Rscript -e 'install.packages("zoo")' 
+                            Rscript -e 'install.packages("lubridate")'
                         - run: |
                             chmod +x 'oxcgrt/codes/OxCGRT_data_prep.r'
                             Rscript 'oxcgrt/codes/OxCGRT_data_prep.r'
