@@ -10,15 +10,15 @@ jobs:
                         - uses: r-lib/actions/setup-r@master
                           with: 
                                   r-version: '3.5.3' # The R version to be installed 
-                        - name: Install dependencies        
-                          run: |
-                            Rscript -e 'install.packages("here")'
-                            Rscript -e 'install.packages("readr")' 
-                            Rscript -e 'install.packages("haven")' 
-                            Rscript -e 'install.packages("tidyverse")'
-                            Rscript -e 'install.packages("countrycode")' 
-                            Rscript -e 'install.packages("zoo")' 
-                            Rscript -e 'install.packages("lubridate")'
+#                        - name: Install dependencies        
+#                          run: |
+#                            Rscript -e 'install.packages("here")'
+#                            Rscript -e 'install.packages("readr")' 
+#                            Rscript -e 'install.packages("haven")' 
+#                            Rscript -e 'install.packages("tidyverse")'
+#                            Rscript -e 'install.packages("countrycode")' 
+#                            Rscript -e 'install.packages("zoo")' 
+#                            Rscript -e 'install.packages("lubridate")'
                         - run: |
                             chmod +x 'oxcgrt/codes/OxCGRT_data_prep.r'
                             Rscript 'oxcgrt/codes/OxCGRT_data_prep.r'
