@@ -14,14 +14,14 @@ jobs:
                           run: |
                             install.packages(c("here", "readr", "haven", "dplyr","countrycode", "zoo", "lubridate"))
                         - run: |
-                            chmod +x 'auto_test/usdata.r'
-                            Rscript 'auto_test/usdata.r'
+                            chmod +x 'oxcgrt/codes/OxCGRT_data_prep.r'
+                            Rscript 'oxcgrt/codes/OxCGRT_data_prep.r'
                         - name: Commit changes
                           run: |
                             git config --local user.email "action@github.com"
                             git config --local user.name "GitHub Action"
                             git add .
-                            git diff-index --quiet HEAD || git commit -m "Push latest OxCGRT US data" -a
+                            git diff-index --quiet HEAD || git commit -m "Testing OxCGRT appended data" -a
                         - name: Push changes
                           uses: ad-m/github-push-action@master
                           with:
