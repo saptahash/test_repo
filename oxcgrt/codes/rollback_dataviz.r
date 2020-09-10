@@ -10,9 +10,14 @@ library(ggrepel)
 library(gganimate)
 library(plotly)
 library(ggpubr)
+library(feather)
+library(viridis)
 
 ## Bring in functions file
 source("rollbackviz_fun.r")
+
+## Read the data file
+oxcgrtdata <- read_feather("../data/output/OxCGRT_latest.feather")
 
 ## set theme
 theme_set(theme_gray())
@@ -20,10 +25,18 @@ theme_set(theme_gray())
 ##-----selecting important columns for further analysis------------------- 
 
 ## To be used to make lineplots
+date <- lubridate::as_date(max(oxcgrtdata$Date)) - 7
+
 lineplot_rollback <- oxcgrtdata %>% 
-  select(CountryCode, region, openness_risk, StringencyIndex, CountryName, Date) %>% 
+  select(CountryCode, region, openness_risk, StringencyIndex, CountryName, cases_controlled, Date) %>% 
   mutate(openness_risk = ifelse(openness_risk < 0, 0, openness_risk),
-    Date = lubridate::ymd(Date))
+    Date = lubridate::ymd(Date)) %>% 
+  filter(Date <= date)
+##------select key countries to be labelled and charted in line plot---------
+
+## additionally selecting Spain here to be labelled in scatter plots
+country_lineplot <- c("CHN", "KOR", "FRA", "ITA", "GBR", "USA", "NZL", "IND", "GER", "RUS",
+                      "SWE", "AUS", "ZFA", "BRA", "ESP")
 
 ## for practically all other plots
 plot_rollback <- oxcgrtdata %>% 
@@ -42,28 +55,30 @@ plot_rollback <- plot_rollback %>% group_by(CountryCode) %>% arrange(CountryCode
          lightup_state = ifelse(StringencyIndex < 50 & (lag1_SI >= 50 | lag2_SI >= 50 | lag3_SI >= 50 | lag4_SI >= 50 | lag5_SI >= 50), 1, 0)) %>%
   select(-starts_with("lag"))
 
-##------select key countries to be labelled and charted in line plot---------
+##----------- HEADLINE LINE PLOT - Panel of 12 countries --------------------
 
+## removing Spain from the list so lineplots are still produced for 12 countries
 country_lineplot <- c("CHN", "KOR", "FRA", "ITA", "GBR", "USA", "NZL", "IND", "GER", "RUS",
                       "SWE", "AUS", "ZFA", "BRA")
-
-##----------- HEADLINE LINE PLOT - Panel of 12 countries --------------------
 
 ggplot(lineplot_rollback %>% filter(CountryCode %in% country_lineplot), aes(x = Date, group = 1)) + 
   geom_line(aes(y = openness_risk)) + 
   geom_line(aes(y = StringencyIndex/100), colour = "red") + 
   scale_y_continuous(
-    name = "Openness Risk", 
+    name = "Risk of Openness", 
     sec.axis = sec_axis(~.*100, name = "Stringency Index")) + 
-  scale_x_date(breaks = seq.Date(lubridate::ymd(min(lineplot_rollback$Date)), lubridate::ymd(max(lineplot_rollback$Date)),21)) + 
-  theme(axis.text.x = element_text(size = 6.5, angle = 20), 
+  scale_x_date(breaks = seq.Date(lubridate::ymd(min(lineplot_rollback$Date)), lubridate::ymd(date),30), 
+               date_labels = "%d-%b") + 
+  theme(axis.text.x = element_text(size = 6.5), 
         axis.text.y.right = element_text(colour = "red"), 
         axis.title.y.right = element_text(colour = "red"), 
-        plot.caption = element_text(hjust = 0.0, face = "italic"), 
+        strip.text = element_text(size = 15),
+        plot.caption = element_text(hjust = 0.5, face = "italic"), 
         plot.title = element_text(hjust = 0.5)) + 
-  labs(title = "Openness Risk Index and Stringency Index of twelve countries over time",
-       caption = "Source: Oxford COVID-19 Government Response Tracker. More at https://github.com/OxCGRT/covid-policy-tracker 
-       or bsg.ox.ac.uk/covidtracker") + 
+  labs(caption = paste("Data represented until ",date,"\n Source: Oxford COVID-19 Government Response Tracker. More at https://github.com/OxCGRT/covid-policy-tracker 
+       or bsg.ox.ac.uk/covidtracker", sep = "")
+#       ,title = "Openness Risk Index and Stringency Index of twelve countries over time"
+       ) + 
   facet_wrap(~ CountryName)
 
 ggsave(paste("../graphs/new-score/lineplot_latest", ".png", sep = ""),
@@ -137,7 +152,7 @@ ggsave(paste("../graphs/new-score/summary_scatterSIroll_latest", ".png", sep = "
 ## -----------------------  HEADLINE DETAILED SCATTER PLOTS ------------------------
 scatter.SI.rollback.detail(as.Date(date))
 
-ggsave(paste("../graphs/new-score/detail_scatterSIroll_latest", ".png", sep = ""), width = 10, 
+ggsave(paste("../graphs/new-score/detail_scatterSIroll_latest", ".png", sep = ""), width = 12, 
        height = 8)
 
 #' CODE NOTES:
@@ -147,31 +162,31 @@ ggsave(paste("../graphs/new-score/detail_scatterSIroll_latest", ".png", sep = ""
 
 #---------------------------- .GIF of scatter plot over time -----------------------
 
-scatterplot_frame <- ggplot(plot_rollback %>% filter(Date < date) %>% arrange(Date),
-                            aes(x = openness_risk, y = StringencyIndex, colour = factor(lightup_state), label = CountryCode)) + 
-  geom_point(aes(size = newcases)) +
-  lims(colour = c("0", "1")) +
-  geom_text_repel(data = subset(plot_rollback, key_country == 1 | lightup_state == 1 | (StringencyIndex < 35 & openness_risk > 0.4)), 
-                size = 3, colour  = "black") + 
-  #    annotate(geom = "text", x = 0.01, y = 37, label = "Countries below this range are scaling back lockdown", 
-  #             size = 1.5, hjust = "left") +
-  geom_hline(yintercept = 50, size = 0.3, linetype = 2) + 
-  geom_vline(xintercept = 0.5, size = 0.3, linetype = 2) +
-  labs(x = "Openness Risk", 
-       y = "Stringency Index", 
-       title = "Mapping Stringency Index and Rollback readiness", 
-       subtitle = "Date: {current_frame}") + 
-  guides(size = F, colour = F) + 
-#  scale_colour_discrete(name = "", breaks = c(1), labels = c("Scaling back lockdown")) +
-  scale_y_continuous(breaks = c(25, 35, 50, 75, 100)) + 
-  scale_size(range = c(2,15)) +
-#  facet_wrap(~ region) +
-#  viridis::scale_color_viridis(discrete = T) +
-  transition_manual(Date) + 
-  ease_aes()
-
-rollback_anim <- animate(scatterplot_frame, fps = 2, width = 1000, height = 800, renderer = gifski_renderer(loop = F))
-save_animation(rollback_anim, file = "../graphs/gifs/scatterplot_fps2.gif")
+# scatterplot_frame <- ggplot(plot_rollback %>% filter(Date < date) %>% arrange(Date),
+#                             aes(x = openness_risk, y = StringencyIndex, colour = factor(lightup_state), label = CountryCode)) + 
+#   geom_point(aes(size = newcases)) +
+#   lims(colour = c("0", "1")) +
+#   geom_text_repel(data = subset(plot_rollback, key_country == 1 | lightup_state == 1 | (StringencyIndex < 35 & openness_risk > 0.4)), 
+#                 size = 3, colour  = "black") + 
+#   #    annotate(geom = "text", x = 0.01, y = 37, label = "Countries below this range are scaling back lockdown", 
+#   #             size = 1.5, hjust = "left") +
+#   geom_hline(yintercept = 50, size = 0.3, linetype = 2) + 
+#   geom_vline(xintercept = 0.5, size = 0.3, linetype = 2) +
+#   labs(x = "Openness Risk", 
+#        y = "Stringency Index", 
+#        title = "Mapping Stringency Index and Rollback readiness", 
+#        subtitle = "Date: {current_frame}") + 
+#   guides(size = F, colour = F) + 
+# #  scale_colour_discrete(name = "", breaks = c(1), labels = c("Scaling back lockdown")) +
+#   scale_y_continuous(breaks = c(25, 35, 50, 75, 100)) + 
+#   scale_size(range = c(2,15)) +
+# #  facet_wrap(~ region) +
+# #  viridis::scale_color_viridis(discrete = T) +
+#   transition_manual(Date) + 
+#   ease_aes()
+# 
+# rollback_anim <- animate(scatterplot_frame, fps = 2, width = 1000, height = 800, renderer = gifski_renderer(loop = F))
+# save_animation(rollback_anim, file = "../graphs/gifs/scatterplot_fps2.gif")
 
 ### ----------------- TILE MAPS --------------------------------------
 
@@ -184,34 +199,35 @@ for(r in region_list){
 
 ### -------- DAILY TILE MAP
 current.rollback.df <- oxcgrtdata %>% filter(Date == as.Date(date)) %>% 
-  select(CountryCode, openness_risk, community_understanding, 
+  select(CountryCode, CountryName, openness_risk, community_understanding, 
          test_and_trace, manage_imported_cases, cases_controlled, region) %>%
   mutate(openness_risk = ifelse(openness_risk < 0, 0, openness_risk))
 
 current.rollback.df <- current.rollback.df %>% 
-  pivot_longer(-c(CountryCode, region), names_to = "index_name", values_to = "index_value") %>% 
+  pivot_longer(-c(CountryName, CountryCode, region), names_to = "index_name", values_to = "index_value") %>% 
   mutate(index_name = case_when(index_name == "cases_controlled" ~ "Cases Controlled", 
                                 index_name == "community_understanding" ~ "Community Understanding", 
                                 index_name == "manage_imported_cases" ~ "Imported Cases", 
-                                index_name == "openness_risk" ~ "Openness Risk", 
+                                index_name == "openness_risk" ~ "Risk of Openness",
                                 index_name == "test_and_trace" ~ "Test and Trace"))
 
-daily.heatmap.title <- paste("Heatmap of Openness Risk and it's breakdown for", as.Date(date))
-chloro.daily <- ggplot(current.rollback.df, aes(x = index_name, y = forcats::fct_rev(CountryCode), fill = index_value)) +
+daily.heatmap.title <- paste("Heatmap of Risk of Openness and it's breakdown for", as.Date(date))
+chloro.daily <- ggplot(current.rollback.df, aes(x = index_name, y = forcats::fct_rev(CountryName), fill = index_value)) +
   geom_tile(width = 0.95, height = 0.9) + 
   theme_classic() +
   scale_fill_viridis_c(name = "Scale (0-1)",na.value = "gray", direction = -1, breaks = c(0, 0.2, 0.4, 0.6, 0.8, 1.0)) +
+  #scale_fill_viridis_c()#name = "Scale (0-1)") + #,na.value = "gray", direction = -1, breaks = c(0, 0.2, 0.4, 0.6, 0.8, 1.0)) +
   theme(axis.text.y = element_text(size = 10), 
         axis.text.x = element_text(size = 8),
-        plot.caption = element_text(hjust = 0.0, face = "italic"), 
+        plot.caption = element_text(hjust = 0.5, face = "italic"), 
         plot.title = element_text(hjust = 0.5)) + 
-  labs(y = "Country Code (ISO-3)", 
+  labs(y = "Country", 
        x = "", 
        caption = "Source: Oxford COVID-19 Government Response Tracker. More at https://github.com/OxCGRT/covid-policy-tracker or bsg.ox.ac.uk/covidtracker", 
        title = daily.heatmap.title) +
   scale_x_discrete(limits = c("Cases Controlled", "Community Understanding", 
                               "Imported Cases", "Test and Trace", 
-                              "Openness Risk"), position = "top")
+                              "Risk of Openness"), position = "top")
 
 ggsave(paste("../graphs/new-score/dailytilemap_latest", ".png", sep = ""), width = 10, 
        height = 25, plot = chloro.daily)
@@ -637,11 +653,6 @@ ggsave(paste("../graphs/new-score/chloropleth_latest", ".png", sep = ""), width 
 # #        y = "Country Code (ISO-3)")
 
 ## generating and saving tile map
-
-
-
-
-
 
 
 

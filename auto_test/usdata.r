@@ -1,4 +1,4 @@
-#!/usr/bin/Rscript
+#!/usr/bin/env Rscript --vanilla
 
 if(!require(dplyr)) install.packages("dplyr")
 library(dplyr)

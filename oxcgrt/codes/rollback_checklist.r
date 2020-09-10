@@ -4,6 +4,8 @@
 library(dplyr)
 library(tidyr)
 library(RcppRoll)
+library(feather)
+library(zoo)
 
 # define global macros
 data_date <- lubridate::today()
@@ -20,13 +22,16 @@ oxcgrtdata <- oxcgrtdata %>% arrange(CountryCode, Date) %>% group_by(CountryCode
          H2_Testing.policy_1 = H2_Testing.policy, 
          C8_International_1 = C8_International.travel.controls,
          H1_Public.info_1 = H1_Public.information.campaigns) %>% 
-  fill(H3_Contact.tracing_1, H2_Testing.policy_1, C8_International_1, H1_Public.info_1)
+  fill(H3_Contact.tracing_1, H2_Testing.policy_1, C8_International_1, H1_Public.info_1) %>% 
+  mutate(ConfirmedCases = na.approx(ConfirmedCases, na.rm = F), 
+         ConfirmedDeaths = na.approx(ConfirmedDeaths, na.rm = F))
 
 
 ### Define cases_controlled metric
 ## Compute 7-day rolling avg of cases
 oxcgrtdata <- oxcgrtdata %>% arrange(CountryCode, Date) %>% group_by(CountryCode) %>%
-  mutate(moveave_confirmedcases = zoo::rollmean(ConfirmedCases, k = 7, fill = NA, align = 'right')) %>%
+  mutate(moveave_confirmedcases = zoo::rollmean(ConfirmedCases, k = 7, fill = NA, na.rm = T, align = 'right'), 
+         moveave_confirmedcases = ifelse(is.nan(moveave_confirmedcases), NA, moveave_confirmedcases)) %>%
   mutate(lag_moveave_cases = lag(moveave_confirmedcases, order_by = Date), 
          newcases = ifelse(moveave_confirmedcases - lag_moveave_cases > 0, moveave_confirmedcases - lag_moveave_cases, 0), 
          cases_controlled = ifelse((50-newcases)/50 > 0, (50-newcases)/50, 0)) 
@@ -43,14 +48,15 @@ oxcgrtdata <- oxcgrtdata %>% arrange(CountryCode, Date) %>% group_by(CountryCode
 
 # CODE BUG ALERT - Inf handling in test_percase, min_tests and max_tests
 oxcgrtdata <- oxcgrtdata %>% arrange(Date, CountryCode) %>% group_by(Date) %>%
-  mutate(min_tests = min(test_percase, na.rm = T), 
-         max_tests = max(test_percase, na.rm = T)) %>%
-  mutate(test_score = (log(test_percase) - log(min_tests))/(log(max_tests) - log(min_tests)))
+  mutate(min_tests = ifelse(is.finite(min(test_percase, na.rm = T)),min(test_percase, na.rm = T), NA), 
+         max_tests = ifelse(is.finite(max(test_percase, na.rm = T)),max(test_percase, na.rm = T), NA))  %>% 
+  mutate(test_score = ifelse(!is.na(max_tests) & !is.na(min_tests) & (max_tests > 0) & (min_tests > 0) & (max_tests != min_tests), 
+                             (log(test_percase) - log(min_tests))/(log(max_tests) - log(min_tests)), NA))
 
-oxcgrtdata <- oxcgrtdata %>% group_by(Date) %>% mutate(global_mean_test_score = mean(test_score, na.rm = T)) %>% 
-  mutate(test_score = ifelse(is.na(test_score) == T, global_mean_test_score, test_score)) %>%
+oxcgrtdata <- oxcgrtdata %>% group_by(Date) %>% mutate(global_mean_test_score = ifelse(is.finite(mean(test_score, na.rm = T)), mean(test_score, na.rm = T), NA)) %>% 
+  mutate(test_score = ifelse(is.na(test_score), global_mean_test_score, test_score)) %>%
   ungroup() %>%
-  mutate(test_score = ifelse(is.na(test_nodata) == T , test_score, 0))
+  mutate(test_score = ifelse(is.na(test_nodata), test_score, 0))
 
 oxcgrtdata <- oxcgrtdata %>% mutate(test_and_trace = 0.25*H3_Contact.tracing_1/3 + 0.25*H2_Testing.policy_1/2 + 0.5*test_score) 
 
@@ -87,7 +93,7 @@ oxcgrtdata <- oxcgrtdata %>% arrange(CountryCode, Date) %>% group_by(CountryCode
          min_apple = roll_min(apple_ave, n = 28L, align = "right", fill = NA, na.rm = T),
          min_google = ifelse(is.infinite(min_google), NA, min_google)) 
 
-oxcgrtdata <- oxcgrtdata %>% mutate(mob = pmin(google_ave, apple_ave, na.rm = T), 
+oxcgrtdata <- oxcgrtdata %>% mutate(mob = pmin(min_apple, min_google, na.rm = T), 
                                     mob = case_when(mob < 20 ~ 20,
                                                     mob > 20 & mob < 120 ~ mob,
                                                     mob > 120 & (is.na(mob) == F) ~ 120))
@@ -109,47 +115,67 @@ oxcgrtdata$rollback_score <- rowMeans(oxcgrtdata[c("community_understanding", "t
 oxcgrtdata <- oxcgrtdata %>% mutate(openness_risk = 1 - rollback_score)
 write.csv(oxcgrtdata, file = paste("../data/output/OxCGRT_", data_date, ".csv", sep = ""))
 
+## Adding in an endemic factor calculation 
+#' Endemic factor defined as metric between [0-1] for cases/mill between 50-200
 
+## creating a cases per million variable
+oxcgrtdata <- oxcgrtdata %>% mutate(newcases_permillion = newcases/(popWB/1000000), 
+                                    endemic_factor = case_when(newcases_permillion < 50 ~ 0, 
+                                                               newcases_permillion > 200 ~ 1, 
+                                                               newcases_permillion < 200 & !is.na(newcases_permillion) ~ (newcases_permillion - 50)/150)) 
 
-# ############ Defining how countries have moved out of lockdown 
-# 
-# ## OO lockdown definition -> if stringency index < 35 -> rolled out of lockdown
-# oxcgrtdata$outoflockdown <- ifelse(oxcgrtdata$StringencyIndex <= 35, 1, 0)
-# 
-# ## defining alternative rollback definition for countries that have rolled out of lockdown
-# oxcgrtdata$alt_rollbackscore <- rowMeans(oxcgrtdata[c("test_and_trace", "cases_controlled")], na.rm = T)
-# 
-# ## recoding a new rollback variable for visualisation purposes 
-# oxcgrtdata$recoded_rollback <- ifelse(oxcgrtdata$outoflockdown == 1, 
-#                                       oxcgrtdata$alt_rollbackscore, oxcgrtdata$rollback_score)
+## recalculating rollback score
+oxcgrtdata <- oxcgrtdata %>% mutate(openness_risk = ifelse(!is.na(endemic_factor), endemic_factor + (1 - endemic_factor)*openness_risk, openness_risk))
+
+## recalibrating openness index for the start dates 
+oxcgrtdata <- oxcgrtdata %>% 
+  mutate(openness_risk = ifelse(is.na(cases_controlled), NA, openness_risk))
 
 write.csv(oxcgrtdata, file = paste("../data/output/OxCGRT_", data_date, ".csv", sep = ""))
+write_feather(oxcgrtdata, path = "../data/output/OxCGRT_latest.feather")
+
+## Creating a custom csv file for timeseries 
+ORI_output <- 
+  oxcgrtdata %>%
+  select(CountryCode, CountryName, Date, community_understanding, manage_imported_cases, cases_controlled, test_and_trace,
+         endemic_factor, openness_risk)
+
+write.csv(ORI_output, file = paste("../data/output/ORI_timeseries_latest", ".csv", sep = ""))
+
+###---------------------End of current code - clean up anything after this-------------------###
+
+
+
+
+
+
+
 
 
 # Updating definition of cases_controlled - adding new cases_controlled_100k to record this
-oxcgrtdata <- oxcgrtdata %>%
-  mutate(cases_per100k = newcases/(popWB/100000), 
-         cases_controlled_per100k = case_when(cases_per100k >= 25 ~ 0, 
-                                              cases_per100k < 25 ~ ((25-cases_per100k)/25)))
-
-##------------------OLD INDEX--------------------
-
-# Updating old score to reflect the change in manage_imported cases
-oxcgrtdata$rollback_score <- rowMeans(oxcgrtdata[c("community_understanding", "test_and_trace",
-                                                   "manage_imported_cases", "cases_controlled")], na.rm = T)
-
-oxcgrtdata <- oxcgrtdata %>% mutate(openness_risk = 1 - rollback_score)
-
-##------------------ NEW INDEX---------------------
-
-# Calculating new rollback readiness score
-oxcgrtdata$recoded_rollback <- rowMeans(oxcgrtdata[c("community_understanding", "test_and_trace",
-                                                   "manage_imported_cases", "cases_controlled_per100k")], na.rm = T)
-
-# Invert score to reflect openess risk 
-oxcgrtdata <- oxcgrtdata %>% mutate(openness_risk_new = 1 - recoded_rollback)
-
-write.csv(oxcgrtdata, file = paste("../data/output/OxCGRT_", data_date, ".csv", sep = ""))
+# oxcgrtdata <- oxcgrtdata %>%
+#   mutate(cases_per100k = newcases/(popWB/100000), 
+#          cases_controlled_per100k = case_when(cases_per100k >= 25 ~ 0, 
+#                                               cases_per100k < 25 ~ ((25-cases_per100k)/25)))
+# 
+# ##------------------OLD INDEX--------------------
+# 
+# # Updating old score to reflect the change in manage_imported cases
+# oxcgrtdata$rollback_score <- rowMeans(oxcgrtdata[c("community_understanding", "test_and_trace",
+#                                                    "manage_imported_cases", "cases_controlled")], na.rm = T)
+# 
+# oxcgrtdata <- oxcgrtdata %>% mutate(openness_risk = 1 - rollback_score)
+# 
+# ##------------------ NEW INDEX---------------------
+# 
+# # Calculating new rollback readiness score
+# oxcgrtdata$recoded_rollback <- rowMeans(oxcgrtdata[c("community_understanding", "test_and_trace",
+#                                                    "manage_imported_cases", "cases_controlled_per100k")], na.rm = T)
+# 
+# # Invert score to reflect openess risk 
+# oxcgrtdata <- oxcgrtdata %>% mutate(openness_risk_new = 1 - recoded_rollback)
+# 
+# write.csv(oxcgrtdata, file = paste("../data/output/OxCGRT_", data_date, ".csv", sep = ""))
 
 
 
