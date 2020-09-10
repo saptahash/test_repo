@@ -10,7 +10,9 @@ jobs:
                         - uses: r-lib/actions/setup-r@master
                           with: 
                                   r-version: '3.5.3' # The R version to be installed 
-                        - run: Rscript 'auto_test/usdata.r'
+                        - run: |
+                            chmod +x 'auto_test/usdata.r'
+                            Rscript 'auto_test/usdata.r'
                         - name: Commit changes
                           run: |
                             git config --local user.email "action@github.com"
