@@ -20,6 +20,7 @@ jobs:
                              Rscript -e 'remotes::install_cran("feather")'
                              Rscript -e 'remotes::install_cran("rgeos")'
                              Rscript -e 'remotes::install_cran("ggrepel")'
+                             Rscript -e 'remotes::install_cran("ggthemes")'
                              Rscript -e 'remotes::install_cran("viridis")'
                              Rscript -e 'remotes::install_cran("tidyverse")'
                              Rscript -e 'remotes::install_cran("RcppRoll")'
