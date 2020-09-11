@@ -6,12 +6,14 @@ library(tidyr)
 library(RcppRoll)
 library(feather)
 library(zoo)
+library(here)
 
+here()
 # define global macros
 data_date <- lubridate::today()
 
 # read in base csv file
-oxcgrtdata <- read.csv(file = paste("../data/output/OxCGRT_", data_date, ".csv", sep = ""), stringsAsFactors = FALSE)
+oxcgrtdata <- read.csv(file = paste("./oxcgrt/data/output/OxCGRT_", data_date, ".csv", sep = ""), stringsAsFactors = FALSE)
 
 # Filling in gaps in indicators
 ## Code Optimisation Notes - can use lapply here
@@ -113,7 +115,7 @@ oxcgrtdata$rollback_score <- rowMeans(oxcgrtdata[c("community_understanding", "t
                                                    "manage_imported_cases", "cases_controlled")], na.rm = T)
 
 oxcgrtdata <- oxcgrtdata %>% mutate(openness_risk = 1 - rollback_score)
-write.csv(oxcgrtdata, file = paste("../data/output/OxCGRT_", data_date, ".csv", sep = ""))
+write.csv(oxcgrtdata, file = paste("./oxcgrt/data/output/OxCGRT_", data_date, ".csv", sep = ""))
 
 ## Adding in an endemic factor calculation 
 #' Endemic factor defined as metric between [0-1] for cases/mill between 50-200
@@ -131,8 +133,8 @@ oxcgrtdata <- oxcgrtdata %>% mutate(openness_risk = ifelse(!is.na(endemic_factor
 oxcgrtdata <- oxcgrtdata %>% 
   mutate(openness_risk = ifelse(is.na(cases_controlled), NA, openness_risk))
 
-write.csv(oxcgrtdata, file = paste("../data/output/OxCGRT_", data_date, ".csv", sep = ""))
-write_feather(oxcgrtdata, path = "../data/output/OxCGRT_latest.feather")
+write.csv(oxcgrtdata, file = paste("./oxcgrt/data/output/OxCGRT_", data_date, ".csv", sep = ""))
+write_feather(oxcgrtdata, path = "./oxcgrt/data/output/OxCGRT_latest.feather")
 
 ## Creating a custom csv file for timeseries 
 ORI_output <- 
@@ -140,7 +142,7 @@ ORI_output <-
   select(CountryCode, CountryName, Date, community_understanding, manage_imported_cases, cases_controlled, test_and_trace,
          endemic_factor, openness_risk)
 
-write.csv(ORI_output, file = paste("../data/output/ORI_timeseries_latest", ".csv", sep = ""))
+write.csv(ORI_output, file = paste("./oxcgrt/data/output/ORI_timeseries_latest", ".csv", sep = ""))
 
 ###---------------------End of current code - clean up anything after this-------------------###
 
