@@ -1,10 +1,10 @@
 #!/usr/bin/env Rscript --vanilla
 
-if(!require(dplyr)) install.packages("dplyr")
+#if(!require(dplyr)) install.packages("dplyr")
 if(!require(here)) install.packages("here")
 
 library(here)
-library(dplyr)
+library(tidyverse)
 
 here()
 US_covid <- read.csv("https://raw.githubusercontent.com/OxCGRT/USA-covid-policy/master/data/OxCGRT_US_latest.csv")

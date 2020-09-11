@@ -12,16 +12,25 @@ jobs:
                                   r-version: '3.5.3' # The R version to be installed 
                         - name: Install dependencies        
                           run: |
-                            install.packages(c("here", "readr", "haven", "dplyr","countrycode", "zoo", "lubridate"))
+                             sudo apt-get install libcurl4-openssl-dev
+                             Rscript -e 'install.packages("remotes")'
+                             Rscript -e 'remotes::install_cran("tidyverse")'
+#                            Rscript -e 'install.packages("here")'
+#                            Rscript -e 'install.packages("readr")' 
+#                            Rscript -e 'install.packages("haven")' 
+#                            Rscript -e 'install.packages("tidyverse")'
+#                            Rscript -e 'install.packages("countrycode")' 
+#                            Rscript -e 'install.packages("zoo")' 
+#                            Rscript -e 'install.packages("lubridate")'
                         - run: |
-                            chmod +x 'auto_test/usdata.r'
-                            Rscript 'auto_test/usdata.r'
+                            chmod +x 'oxcgrt/codes/OxCGRT_data_prep.r'
+                            Rscript 'oxcgrt/codes/OxCGRT_data_prep.r'
                         - name: Commit changes
                           run: |
                             git config --local user.email "action@github.com"
                             git config --local user.name "GitHub Action"
                             git add .
-                            git diff-index --quiet HEAD || git commit -m "Push latest OxCGRT US data" -a
+                            git diff-index --quiet HEAD || git commit -m "Testing OxCGRT appended data" -a
                         - name: Push changes
                           uses: ad-m/github-push-action@master
                           with:
