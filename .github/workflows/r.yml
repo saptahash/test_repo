@@ -10,8 +10,10 @@ jobs:
                         - uses: r-lib/actions/setup-r@master
                           with: 
                                   r-version: '3.5.3' # The R version to be installed 
-#                        - name: Install dependencies        
-#                          run: |
+                        - name: Install dependencies        
+                          run: |
+                             install.packages('remotes')
+                             remotes::install_cran("tidyverse")
 #                            Rscript -e 'install.packages("here")'
 #                            Rscript -e 'install.packages("readr")' 
 #                            Rscript -e 'install.packages("haven")' 
