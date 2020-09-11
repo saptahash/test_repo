@@ -8,16 +8,18 @@ library("rnaturalearth")
 library("rnaturalearthdata")
 library(ggrepel)
 library(gganimate)
-library(plotly)
+#library(plotly)
 library(ggpubr)
 library(feather)
 library(viridis)
+library(here)
 
+here()
 ## Bring in functions file
 source("rollbackviz_fun.r")
 
 ## Read the data file
-oxcgrtdata <- read_feather("../data/output/OxCGRT_latest.feather")
+oxcgrtdata <- read_feather("./oxcgrt/data/output/OxCGRT_latest.feather")
 
 ## set theme
 theme_set(theme_gray())
@@ -81,7 +83,7 @@ ggplot(lineplot_rollback %>% filter(CountryCode %in% country_lineplot), aes(x = 
        ) + 
   facet_wrap(~ CountryName)
 
-ggsave(paste("../graphs/new-score/lineplot_latest", ".png", sep = ""),
+ggsave(paste("./oxcgrt/data/output/lineplot_latest", ".png", sep = ""),
        width = 16, 
        height = 8)
 
@@ -145,14 +147,14 @@ dateseq_scatter <- dateseq_scatter[order(dateseq_scatter)]
 ##---------------------- HEADLINE SUMMARY SCATTER PLOT ------------------
 finalplot <- scatter.SI.rollback(dateseq_scatter)
 
-ggsave(paste("../graphs/new-score/summary_scatterSIroll_latest", ".png", sep = ""), plot = finalplot,
+ggsave(paste("./oxcgrt/data/output/summary_scatterSIroll_latest", ".png", sep = ""), plot = finalplot,
        width = 12, 
        height = 8)
 
 ## -----------------------  HEADLINE DETAILED SCATTER PLOTS ------------------------
 scatter.SI.rollback.detail(as.Date(date))
 
-ggsave(paste("../graphs/new-score/detail_scatterSIroll_latest", ".png", sep = ""), width = 12, 
+ggsave(paste("./oxcgrt/data/output/detail_scatterSIroll_latest", ".png", sep = ""), width = 12, 
        height = 8)
 
 #' CODE NOTES:
@@ -193,7 +195,7 @@ ggsave(paste("../graphs/new-score/detail_scatterSIroll_latest", ".png", sep = ""
 ###------------summary tile map
 for(r in region_list){
   p <- tilemap.regionwise(r)
-  ggsave(paste("../graphs/new-score/tilemap_latest_", r, ".png", sep = ""), width = 20, 
+  ggsave(paste("./oxcgrt/data/output/tilemap_latest_", r, ".png", sep = ""), width = 20, 
          height = 10, plot = p)
 }
 
@@ -229,7 +231,7 @@ chloro.daily <- ggplot(current.rollback.df, aes(x = index_name, y = forcats::fct
                               "Imported Cases", "Test and Trace", 
                               "Risk of Openness"), position = "top")
 
-ggsave(paste("../graphs/new-score/dailytilemap_latest", ".png", sep = ""), width = 10, 
+ggsave(paste("./oxcgrt/data/output/dailytilemap_latest", ".png", sep = ""), width = 10, 
        height = 25, plot = chloro.daily)
 
 
@@ -247,7 +249,7 @@ map_df <- left_join(world, plot_rollback, by = c("iso_a3" = "CountryCode"))
 
 chloro.sum <- chloropleth.map.summary(dateseq_scatter)
 
-ggsave(paste("../graphs/new-score/chloropleth_latest", ".png", sep = ""), width = 15, 
+ggsave(paste("./oxcgrt/data/output/chloropleth_latest", ".png", sep = ""), width = 15, 
        height = 7.5, plot = chloro.sum)
 
 ####-------------------Diagnostics (START)-----------------------
