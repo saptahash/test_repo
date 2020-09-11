@@ -12,6 +12,7 @@ jobs:
                                   r-version: '3.5.3' # The R version to be installed 
                         - name: Install dependencies        
                           run: |
+                             sudo apt-get install libcurl4-openssl-dev
                              Rscript -e 'install.packages("remotes")'
                              Rscript -e 'remotes::install_cran("tidyverse")'
 #                            Rscript -e 'install.packages("here")'
