@@ -26,6 +26,7 @@ oxcgrtdata <- read_feather("./oxcgrt/data/output/OxCGRT_latest.feather")
 theme_set(theme_gray())
 
 ##-----selecting important columns for further analysis------------------- 
+region_list <<- c("East_Asia_Pacific", "Europe_Central_Asia", "Latin_America_Caribbean", "Middle_East_North_Africa", "North_America", "South_Asia", "sub_Saharan_Africa")
 
 ## To be used to make lineplots
 date <- lubridate::as_date(max(oxcgrtdata$Date)) - 7
