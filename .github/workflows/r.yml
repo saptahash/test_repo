@@ -18,6 +18,7 @@ jobs:
                              Rscript -e 'install.packages("remotes")'
                              Rscript -e 'remotes::install_cran("countrycode")'
                              Rscript -e 'remotes::install_cran("feather")'
+                             Rscript -e 'remotes::install_cran("rgeos")'
                              Rscript -e 'remotes::install_cran("ggrepel")'
                              Rscript -e 'remotes::install_cran("viridis")'
                              Rscript -e 'remotes::install_cran("tidyverse")'
