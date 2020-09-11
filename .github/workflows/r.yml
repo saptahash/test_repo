@@ -15,6 +15,12 @@ jobs:
                              sudo apt-get install libcurl4-openssl-dev
                              Rscript -e 'install.packages("remotes")'
                              Rscript -e 'remotes::install_cran("tidyverse")'
+                             Rscript -e 'remotes::install_cran("RcppRoll")'
+                             Rscript -e 'remotes::install_cran("zoo")'
+                             Rscript -e 'remotes::install_cran("sf")'
+                             Rscript -e 'remotes::install_cran("rnaturalearth")'
+                             Rscript -e 'remotes::install_cran("rnaturalearthdata")'
+                             Rscript -e 'remotes::install_cran("ggpubr")'                             
                              echo 'moving on'
 #                            Rscript -e 'install.packages("here")'
 #                            Rscript -e 'install.packages("readr")' 
