@@ -32,6 +32,11 @@ jobs:
                         - run: |
                             chmod +x 'oxcgrt/codes/OxCGRT_data_prep.r'
                             Rscript 'oxcgrt/codes/OxCGRT_data_prep.r'
+                            chmod +x 'oxcgrt/codes/rollback_checklist.r'
+                            Rscript 'oxcgrt/codes/rollback_checklist.r'
+                            chmod +x 'oxcgrt/codes/rollbackviz_fun.r'
+                            chmod +x 'oxcgrt/codes/rollback_dataviz.r'
+                            Rscript 'oxcgrt/codes/rollback_dataviz.r'
                         - name: Commit changes
                           run: |
                             git config --local user.email "action@github.com"
