@@ -3,7 +3,7 @@
 ##################################################################
 
 ### Import and process data exported from OxCGRT database 
-install.packages(c("tidyverse", "countrycode", "zoo", "lubridate", "haven"))
+#install.packages(c("tidyverse", "countrycode", "zoo", "lubridate", "haven"))
 library(readr)
 library(haven)
 library(tidyverse)
