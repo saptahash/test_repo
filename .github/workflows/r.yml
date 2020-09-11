@@ -13,6 +13,7 @@ jobs:
                         - name: Install dependencies        
                           run: |
                              sudo apt-get install libcurl4-openssl-dev
+                             sudo apt install -y libudunits2-0 libudunits2-dev
                              Rscript -e 'install.packages("remotes")'
                              Rscript -e 'remotes::install_cran("tidyverse")'
                              Rscript -e 'remotes::install_cran("RcppRoll")'
