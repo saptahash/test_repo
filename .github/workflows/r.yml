@@ -16,6 +16,7 @@ jobs:
                              sudo apt install -y libudunits2-0 libudunits2-dev
                              sudo apt install libgdal-dev
                              Rscript -e 'install.packages("remotes")'
+                             Rscript -e 'remotes::install_cran("feather")'
                              Rscript -e 'remotes::install_cran("tidyverse")'
                              Rscript -e 'remotes::install_cran("RcppRoll")'
                              Rscript -e 'remotes::install_cran("zoo")'
