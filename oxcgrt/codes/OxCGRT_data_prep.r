@@ -27,7 +27,7 @@ correlates <- c("popWB",  "hosp_beds_WB", "total_sars", "sars_deaths",
                 "total_mers", "h1n1_death_estimate_25pctile",
                 "h1n1_death_estimate_75pctile", "pop_in_cities")
 
-crossnationaldata <- read_dta("../data/input/crossnationaldata.dta") #note - new version stata file
+crossnationaldata <- read_dta("./oxcgrt/data/input/crossnationaldata.dta") #note - new version stata file
 
 correlatesdata <- crossnationaldata %>% select(countrycode, popWB, hosp_beds_WB,
                                                total_sars, sars_deaths, total_mers,
@@ -65,7 +65,7 @@ for(reg in region_list){
 }
 
 
-write.csv(oxcgrtdata, file = paste("../data/output/OxCGRT_", data_date, ".csv", sep = ""))
+write.csv(oxcgrtdata, file = paste("./oxcgrt/data/output/OxCGRT_", data_date, ".csv", sep = ""))
 
 #Stata diff: Not pulling JHU data -> confirm w/ Toby
 
@@ -100,7 +100,7 @@ google.mobility <- google.mobility %>% rename(goog_retail = starts_with("retail"
 
 google.mobility <- google.mobility %>% filter(is.na(sub_region_1) & is.na(sub_region_2) & is.na(metro_area))
 
-write.csv(google.mobility, file = paste("../data/input/googlemobility_", data_date, ".csv", sep = ""))
+write.csv(google.mobility, file = paste("./oxcgrt/data/input/googlemobility_", data_date, ".csv", sep = ""))
 
 # Import Apple Mobility Data
 
@@ -128,7 +128,7 @@ apple.mobility <- apple.mobility %>% pivot_longer(-c(transportation_type, countr
        rename(apple_driving = driving, apple_walking = walking, apple_transit = transit) 
 #is there a more efficient way to do this without two pivots?
 
-write.csv(apple.mobility, file = paste("../data/input/applemobility_", data_date, ".csv", sep = ""))
+write.csv(apple.mobility, file = paste("./oxcgrt/data/input/applemobility_", data_date, ".csv", sep = ""))
 
 #merge with apple and google mobility data
 
@@ -187,7 +187,7 @@ oxcgrtdata <- oxcgrtdata %>% ungroup() %>%
 
 #oxcgrtdata <- oxcgrtdata %>% ungroup() %>% mutate(mobility_ave = rowMeans(oxcgrtdata[,c("apple_ave", "google_ave")], na.rm = T))
 
-write.csv(oxcgrtdata, file = paste("../data/output/OxCGRT_", data_date, ".csv", sep = ""))
+write.csv(oxcgrtdata, file = paste("./oxcgrt/data/output/OxCGRT_", data_date, ".csv", sep = ""))
 
 
 #Bringing in OWID Testing Data
@@ -208,7 +208,7 @@ owid.data <- owid.data %>% arrange(countrycode, Date, desc(test_total))
 owid.data <- owid.data[!duplicated(owid.data[,c("Date", "countrycode")]), ]
 owid.data <- owid.data %>% mutate(Date = as.Date(Date))
 
-write.csv(owid.data, file = paste("../data/input/testing_", data_date, ".csv", sep = ""))
+write.csv(owid.data, file = paste("./oxcgrt/data/input/testing_", data_date, ".csv", sep = ""))
 
 oxcgrtdata <- left_join(oxcgrtdata, owid.data %>% select(countrycode, Date, test_total, test_totalperthou), 
           by = c("Date", "CountryCode"="countrycode"))
@@ -217,7 +217,7 @@ oxcgrtdata <- oxcgrtdata %>% mutate(test_percase = ifelse((ConfirmedCases > 0) &
                                                           test_total/ConfirmedCases, NA))
 
 ### new output file with testing data appended
-write.csv(oxcgrtdata, file = paste("../data/output/OxCGRT_", data_date, ".csv", sep = ""))  
+write.csv(oxcgrtdata, file = paste("./oxcgrt/data/output/OxCGRT_", data_date, ".csv", sep = ""))  
 
 
 ########### using additional data to qualify gaps in testing data 
@@ -233,7 +233,7 @@ no.testing.data <- no.testing.data %>% mutate(countrycode = no.testing.data.ccod
 
 oxcgrtdata <- left_join(oxcgrtdata, no.testing.data %>% select(countrycode, test_nodata), by = c("CountryCode" = "countrycode"))
 
-write.csv(oxcgrtdata, file = paste("../data/output/OxCGRT_", data_date, ".csv", sep = ""))  
+write.csv(oxcgrtdata, file = paste("./oxcgrt/data/output/OxCGRT_", data_date, ".csv", sep = ""))  
 
 
 
