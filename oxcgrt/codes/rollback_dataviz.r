@@ -16,7 +16,7 @@ library(here)
 
 here()
 ## Bring in functions file
-source("rollbackviz_fun.r")
+source("./oxcgrt/codes/rollbackviz_fun.r")
 
 ## Read the data file
 oxcgrtdata <- read_feather("./oxcgrt/data/output/OxCGRT_latest.feather")
