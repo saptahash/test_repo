@@ -12,26 +12,28 @@ jobs:
                                   r-version: '3.5.3' # The R version to be installed 
                         - name: Install dependencies        
                           run: |
-                             sudo apt-get install libcurl4-openssl-dev
-                             sudo apt install -y libudunits2-0 libudunits2-dev
-                             sudo apt install libgdal-dev
-                             Rscript -e 'install.packages("remotes")'
-                             Rscript -e 'remotes::install_cran("countrycode")'
-                             Rscript -e 'remotes::install_cran("feather")'
-                             Rscript -e 'remotes::install_cran("rgeos")'
-                             Rscript -e 'remotes::install_cran("ggrepel")'
-                             Rscript -e 'remotes::install_cran("ggthemes")'
-                             Rscript -e 'remotes::install_cran("viridis")'
-                             Rscript -e 'remotes::install_cran("tidyverse")'
-                             Rscript -e 'remotes::install_cran("RcppRoll")'
-                             Rscript -e 'remotes::install_cran("zoo")'
-                             Rscript -e 'remotes::install_cran("haven")'
-                             Rscript -e 'remotes::install_cran("sf")'
-                             Rscript -e 'remotes::install_cran("rnaturalearth")'
-                             Rscript -e 'remotes::install_cran("rnaturalearthdata")'
-                             Rscript -e 'remotes::install_cran("here")'
+                             chmod +x /oxcgrt/codes/sysrequirements.sh
+                             /oxcgrt/codes/sysrequirements.sh
+#                             sudo apt-get install libcurl4-openssl-dev
+#                             sudo apt install -y libudunits2-0 libudunits2-dev
+#                             sudo apt install libgdal-dev
+#                             Rscript -e 'install.packages("remotes")'
+#                             Rscript -e 'remotes::install_cran("countrycode")'
+#                             Rscript -e 'remotes::install_cran("feather")'
+#                             Rscript -e 'remotes::install_cran("rgeos")'
+#                             Rscript -e 'remotes::install_cran("ggrepel")'
+#                             Rscript -e 'remotes::install_cran("ggthemes")'
+#                             Rscript -e 'remotes::install_cran("viridis")'
+#                             Rscript -e 'remotes::install_cran("tidyverse")'
+#                             Rscript -e 'remotes::install_cran("RcppRoll")'
+#                             Rscript -e 'remotes::install_cran("zoo")'
+#                             Rscript -e 'remotes::install_cran("haven")'
+#                             Rscript -e 'remotes::install_cran("sf")'
+#                             Rscript -e 'remotes::install_cran("rnaturalearth")'
+#                             Rscript -e 'remotes::install_cran("rnaturalearthdata")'
+#                             Rscript -e 'remotes::install_cran("here")'
 
-                             echo 'moving on'
+#                             echo 'moving on'
 #                             Rscript -e 'remotes::install_cran("ggpubr")'                             
 #                            Rscript -e 'install.packages("here")'
 #                            Rscript -e 'install.packages("readr")' 
@@ -40,7 +42,8 @@ jobs:
 #                            Rscript -e 'install.packages("countrycode")' 
 #                            Rscript -e 'install.packages("zoo")' 
 #                            Rscript -e 'install.packages("lubridate")'
-                        - run: |
+                        - name: Run daily data and visualisation codes
+                          run: |
                             chmod +x 'oxcgrt/codes/OxCGRT_data_prep.r'
                             Rscript 'oxcgrt/codes/OxCGRT_data_prep.r'
                             chmod +x 'oxcgrt/codes/rollback_checklist.r'
