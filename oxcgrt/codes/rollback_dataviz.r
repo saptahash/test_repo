@@ -21,7 +21,7 @@ here()
 devtools::source_url("https://raw.githubusercontent.com/saptahash/test_repo/master/oxcgrt/codes/rollbackviz_fun.r")
 
 ## Read the data file
-oxcgrtdata <- read_feather("../data/output/OxCGRT_latest.feather")
+oxcgrtdata <- read_feather("./data/input/OxCGRT_latest.feather")
 
 ## set theme
 theme_set(theme_gray())
