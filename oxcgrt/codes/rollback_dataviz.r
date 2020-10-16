@@ -2,33 +2,40 @@
 ###---------- DATA VISUALISATION CODE FOR OPENNESS RISK INDEX
 #########################
 
+library(here)
 library("ggplot2")
 library("sf")
 library("rnaturalearth")
 library("rnaturalearthdata")
 library(ggrepel)
-library(tidyverse)
 #library(gganimate)
 #library(plotly)
 #library(ggpubr)
 library(feather)
 library(viridis)
-library(here)
-library(devtools)
+library(tidyverse)
+library(lubridate)
 
 here()
 ## Bring in functions file
-devtools::source_url("https://raw.githubusercontent.com/saptahash/test_repo/master/oxcgrt/codes/rollbackviz_fun.r")
-#source("./oxcgrt/codes/rollbackviz_fun.r")
+source("rollbackviz_fun.r")
 
 ## Read the data file
-oxcgrtdata <- read_feather("./oxcgrt/data/output/OxCGRT_latest.feather")
+oxcgrtdata <- read_feather("../data/output/OxCGRT_latest.feather")
 
 ## set theme
 theme_set(theme_gray())
 
-##-----selecting important columns for further analysis------------------- 
+East_Asia_Pacific <<- c("ASM", "AUS", "BRN", "CHN", "FJI", "FSM", "GUM", "HKG", "IDN", "JPN", "KHM", "KIR", "KOR", "LAO", "MAC", "MHL", "MMR", "MNG", "MNP", "MYS", "NCL", "NRU", "NZL", "PHL", "PLW", "PNG", "PRK", "PYF", "SGP", "SLB", "THA", "TLS", "TON", "TUV", "TWN", "VNM", "VUT", "WSM")
+Europe_Central_Asia <<- c("ALB", "AND", "ARM", "AUT", "AZE", "BEL", "BGR", "BIH", "BLR", "CHE", "CHI", "CYP", "CZE", "DEU", "DNK", "ESP", "EST", "FIN", "FRA", "FRO", "GBR", "GEO", "GIB", "GRC", "GRL", "HRV", "HUN", "IMN", "IRL", "ISL", "ITA", "KAZ", "KGZ", "LIE", "LTU", "LUX", "LVA", "MCO", "MDA", "MKD", "MNE", "NLD", "NOR", "POL", "PRT", "ROU", "RUS", "SMR", "SRB", "SVK", "SVN", "SWE", "TJK", "TKM", "TUR", "UKR", "UZB", "RKS")
+Latin_America_Caribbean <<- c("ABW", "ARG", "ATG", "BHS", "BLZ", "BOL", "BRA", "BRB", "CHL", "COL", "CRI", "CUB", "CUW", "CYM", "DMA", "DOM", "ECU", "GRD", "GTM", "GUY", "HND", "HTI", "JAM", "KNA", "LCA", "MAF", "MEX", "NIC", "PAN", "PER", "PRI", "PRY", "SLV", "SUR", "SXM", "TCA", "TTO", "URY", "VCT", "VEN", "VGB", "VIR")
+Middle_East_North_Africa <<- c("ARE", "BHR", "DJI", "DZA", "EGY", "IRN", "IRQ", "ISR", "JOR", "KWT", "LBN", "LBY", "MAR", "MLT", "OMN", "PSE", "QAT", "SAU", "SYR", "TUN", "YEM")
+North_America <<- c("BMU", "CAN", "USA")
+South_Asia <<- c("AFG", "BGD", "BTN", "IND", "LKA", "MDV", "NPL", "PAK")
+sub_Saharan_Africa <<- c("AGO", "BDI", "BEN", "BFA", "BWA", "CAF", "CIV", "CMR", "COD", "COG", "COM", "CPV", "ERI", "ETH", "GAB", "GHA", "GIN", "GMB", "GNB", "GNQ", "KEN", "LBR", "LSO", "MDG", "MLI", "MOZ", "MRT", "MUS", "MWI", "NAM", "NER", "NGA", "RWA", "SDN", "SEN", "SLE", "SOM", "SSD", "STP", "SWZ", "SYC", "TCD", "TGO", "TZA", "UGA", "ZAF", "ZMB", "ZWE")
 region_list <<- c("East_Asia_Pacific", "Europe_Central_Asia", "Latin_America_Caribbean", "Middle_East_North_Africa", "North_America", "South_Asia", "sub_Saharan_Africa")
+
+##-----selecting important columns for further analysis------------------- 
 
 ## To be used to make lineplots
 date <- lubridate::as_date(max(oxcgrtdata$Date)) - 7
@@ -45,8 +52,9 @@ country_lineplot <- c("CHN", "KOR", "FRA", "ITA", "GBR", "USA", "NZL", "IND", "G
                       "SWE", "AUS", "ZFA", "BRA", "ESP")
 
 ## for practically all other plots
+
 plot_rollback <- oxcgrtdata %>% 
-  select(CountryCode, region, ConfirmedCases, StringencyIndex, newcases, openness_risk, rollback_score, Date) %>% 
+  select(CountryCode, region, ConfirmedCases, StringencyIndex, newcases, openness_risk, Date) %>% 
   mutate(openness_risk = ifelse(openness_risk < 0, 0, openness_risk), 
          Date = lubridate::ymd(Date), 
          key_country = ifelse(CountryCode %in% country_lineplot, 1, 0)) %>%
@@ -60,6 +68,8 @@ plot_rollback <- plot_rollback %>% group_by(CountryCode) %>% arrange(CountryCode
          lag5_SI = lag(StringencyIndex, n = 5L),
          lightup_state = ifelse(StringencyIndex < 50 & (lag1_SI >= 50 | lag2_SI >= 50 | lag3_SI >= 50 | lag4_SI >= 50 | lag5_SI >= 50), 1, 0)) %>%
   select(-starts_with("lag"))
+
+print(plot_rollback)
 
 ##----------- HEADLINE LINE PLOT - Panel of 12 countries --------------------
 
@@ -87,7 +97,7 @@ ggplot(lineplot_rollback %>% filter(CountryCode %in% country_lineplot), aes(x = 
        ) + 
   facet_wrap(~ CountryName)
 
-ggsave(paste("./oxcgrt/data/output/lineplot_latest", ".png", sep = ""),
+ggsave(paste("./graphs/lineplot_latest", ".png", sep = ""),
        width = 16, 
        height = 8)
 
@@ -148,17 +158,20 @@ if(length(dateseq_scatter) < 4){
 
 dateseq_scatter <- dateseq_scatter[order(dateseq_scatter)]
 
-##---------------------- HEADLINE SUMMARY SCATTER PLOT ------------------
-finalplot <- scatter.SI.rollback(dateseq_scatter)
+## -----------------------  HEADLINE DETAILED SCATTER PLOTS ------------------------
+message("starting scatter I")
+scatter.SI.rollback.detail(plot_rollback, as.Date(date))
 
-ggsave(paste("./oxcgrt/data/output/summary_scatterSIroll_latest", ".png", sep = ""), plot = finalplot,
-       width = 12, 
+ggsave(paste("./graphs/detail_scatterSIroll_latest", ".png", sep = ""), width = 12, 
        height = 8)
 
-## -----------------------  HEADLINE DETAILED SCATTER PLOTS ------------------------
-scatter.SI.rollback.detail(as.Date(date))
 
-ggsave(paste("./oxcgrt/data/output/detail_scatterSIroll_latest", ".png", sep = ""), width = 12, 
+##---------------------- HEADLINE SUMMARY SCATTER PLOT ------------------
+message("Starting scatter II")
+finalplot <- scatter.SI.rollback(plot_rollback, dateseq_scatter)
+
+ggsave(paste("./graphs/summary_scatterSIroll_latest", ".png", sep = ""), plot = finalplot,
+       width = 12, 
        height = 8)
 
 #' CODE NOTES:
@@ -197,9 +210,10 @@ ggsave(paste("./oxcgrt/data/output/detail_scatterSIroll_latest", ".png", sep = "
 ### ----------------- TILE MAPS --------------------------------------
 
 ###------------summary tile map
+message("starting heatmap")
 for(r in region_list){
-  p <- tilemap.regionwise(r)
-  ggsave(paste("./oxcgrt/data/output/tilemap_latest_", r, ".png", sep = ""), width = 20, 
+  p <- tilemap.regionwise(plot_rollback, r)
+  ggsave(paste("./graphs/tilemap_latest_", r, ".png", sep = ""), width = 20, 
          height = 10, plot = p)
 }
 
@@ -235,7 +249,7 @@ chloro.daily <- ggplot(current.rollback.df, aes(x = index_name, y = forcats::fct
                               "Imported Cases", "Test and Trace", 
                               "Risk of Openness"), position = "top")
 
-ggsave(paste("./oxcgrt/data/output/dailytilemap_latest", ".png", sep = ""), width = 10, 
+ggsave(paste("./graphs/dailytilemap_latest", ".png", sep = ""), width = 10, 
        height = 25, plot = chloro.daily)
 
 
@@ -251,9 +265,9 @@ world <- ne_countries(scale = "medium",returnclass = "sf")
 
 map_df <- left_join(world, plot_rollback, by = c("iso_a3" = "CountryCode"))
 
-chloro.sum <- chloropleth.map.summary(dateseq_scatter)
+chloro.sum <- chloropleth.map.summary(map_df, dateseq_scatter)
 
-ggsave(paste("./oxcgrt/data/output/chloropleth_latest", ".png", sep = ""), width = 15, 
+ggsave(paste("./graphs/chloropleth_latest", ".png", sep = ""), width = 15, 
        height = 7.5, plot = chloro.sum)
 
 ####-------------------Diagnostics (START)-----------------------
