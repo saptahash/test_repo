@@ -208,7 +208,7 @@ owid.data <- owid.data %>% arrange(countrycode, Date, desc(test_total))
 owid.data <- owid.data[!duplicated(owid.data[,c("Date", "countrycode")]), ]
 owid.data <- owid.data %>% mutate(Date = as.Date(Date))
 
-write.csv(owid.data, file = paste("./oxcgrt/data/input/testing_", data_date, ".csv", sep = ""))
+#write.csv(owid.data, file = paste("./oxcgrt/data/input/testing_", data_date, ".csv", sep = ""))
 
 oxcgrtdata <- left_join(oxcgrtdata, owid.data %>% select(countrycode, Date, test_total, test_totalperthou), 
           by = c("Date", "CountryCode"="countrycode"))
