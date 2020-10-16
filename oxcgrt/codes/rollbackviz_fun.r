@@ -18,7 +18,7 @@ twoaxis.line <- function(data, countrylist){
 }
 
 
-scatter.SI.rollback <- function(dateseq_scatter){
+scatter.SI.rollback <- function(plot_rollback, dateseq_scatter){
   ggplot(plot_rollback %>% filter(Date %in% dateseq_scatter), aes(x = openness_risk, y = StringencyIndex, color = factor(lightup_state), label = CountryCode)) + 
     geom_point(aes(size = newcases)) + 
     lims(colour = c("0", "1")) + 
@@ -43,7 +43,7 @@ scatter.SI.rollback <- function(dateseq_scatter){
     facet_wrap(~ Date)
 }
 
-scatter.SI.rollback.detail <- function(date){
+scatter.SI.rollback.detail <- function(plot_rollback,date){
   theme_set(theme_gray())
 #  scatter.plot.title <- paste("Stringency Index and Openness Risk as of ", lubridate::as_date(date), sep = "")
   ggplot(plot_rollback %>% filter(Date == date), aes(x = openness_risk, color = factor(lightup_state), y = StringencyIndex,label = CountryCode)) +  #color = factor(outoflockdown), 
@@ -85,7 +85,7 @@ scatter.SI.rollback.detail <- function(date){
 }
 
 
-tilemap.regionwise <- function(region_name){
+tilemap.regionwise <- function(plot_rollback, region_name){
   tilemap.title = paste("Heatmap of Risk of Openness over time for", region_name, "region", sep = " ")
   ggplot(plot_rollback %>% arrange(CountryCode, Date) %>% ungroup() %>%
            filter(region == region_name) , 
@@ -114,7 +114,7 @@ tilemap.regionwise <- function(region_name){
          caption = "Source: Oxford COVID-19 Government Response Tracker. More at https://github.com/OxCGRT/covid-policy-tracker or bsg.ox.ac.uk/covidtracker") 
 }
 
-chloropleth.map.summary <- function(dateseq_scatter){
+chloropleth.map.summary <- function(map_df, dateseq_scatter){
 #  map.subtitle = paste("Date: ", date, sep = "")
   ggplot(map_df %>% filter(Date %in% dateseq_scatter)) +
     geom_sf(aes(fill = openness_risk)) + 
