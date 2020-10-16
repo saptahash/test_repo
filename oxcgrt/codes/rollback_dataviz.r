@@ -18,7 +18,7 @@ library(lubridate)
 
 here()
 ## Bring in functions file
-source("rollbackviz_fun.r")
+devtools::source_url("https://raw.githubusercontent.com/saptahash/test_repo/master/oxcgrt/codes/rollbackviz_fun.r")
 
 ## Read the data file
 oxcgrtdata <- read_feather("../data/output/OxCGRT_latest.feather")
