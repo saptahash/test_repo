@@ -271,6 +271,7 @@ withr::with_options(
     geom_line(aes(colour = index_name), size = 0.8) + 
     labs(x = "Date", 
          y = "",
+         title = "Relationship between number of COVID-19 cases and government response",
          caption = "Source: Oxford COVID-19 Government Response Tracker. More at https://github.com/OxCGRT/covid-policy-tracker or bsg.ox.ac.uk/covidtracker") + 
     expand_limits(y = c(0, 100)) +
     scale_y_continuous(breaks = c(0, 20, 40, 60, 80, 100)) +
@@ -367,7 +368,8 @@ plot <-
 #                       labels = c("0-20", "20-40", "40-60", "60-80", "80-100", "100"),
 #                       name = "Current Government Response Index level") +
   labs(caption = "Source: Oxford COVID-19 Government Response Tracker. More at https://github.com/OxCGRT/covid-policy-tracker 
-       or bsg.ox.ac.uk/covidtracker") +
+       or bsg.ox.ac.uk/covidtracker",
+       title = "Map of government responses to COVID-19") +
   theme_map() + 
   theme(
     legend.key = element_blank(), 
@@ -440,7 +442,8 @@ plot <-
   geom_sf(aes(fill = days_cat)) + 
   theme_map() +
   labs(caption = "Source: Oxford COVID-19 Government Response Tracker. More at https://github.com/OxCGRT/covid-policy-tracker 
-       or bsg.ox.ac.uk/covidtracker") +
+       or bsg.ox.ac.uk/covidtracker",
+       title = "Map of school closures in responses to COVID-19") +
   scale_fill_manual(values = cols,
                     breaks = c("5", "4", "3", "2", "1", "-1", "-2", "-3"),
                     labels = c(">76", "42 to 76", "28 to 42","14 to 28", "0 to 14", "-28 to 0", "-56 to -28", "<-56"),
