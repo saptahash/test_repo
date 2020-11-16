@@ -4,5 +4,5 @@ sudo apt install -y libudunits2-0 libudunits2-dev
 sudo apt install libgdal-dev
 Rscript -e 'install.packages("remotes")'
 Rscript -e 'remotes::install_cran(c("ellipsis","tidyverse", "devtools", "rgeos", "ggthemes", "zoo","sf", "rnaturalearth", "rnaturalearthdata","here", "scales", "lubridate","writexl","openxlsx","janitor"))'
-Rscript -e 'install_version("dplyr", version = "1.0.1", repos = "http://cran.us.r-project.org")'
+Rscript -e 'devtools::install_url("https://cran.r-project.org/src/contrib/Archive/dplyr/dplyr_1.0.1.tar.gz")'
 Rscript -e 'devtools::install_github("tidyverse/tibble")'
