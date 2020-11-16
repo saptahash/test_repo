@@ -248,6 +248,8 @@ ggsave(plot,
 
 # Global means charts of 180 countries for all indices ----------------------
 
+message("Start G4")
+
 temp_tibble <- 
   oxcgrtdata %>%
   ungroup() %>%
@@ -257,7 +259,8 @@ temp_tibble <-
             chi_mean = mean(ContainmentHealthIndexForDisplay, na.rm = T), 
             esi_mean = mean(EconomicSupportIndexForDisplay, na.rm = T)) %>%
   mutate(Date = lubridate::ymd(Date)) %>%
-  pivot_longer(-c(Date), names_to = "index_name", values_to = "index_value")
+  pivot_longer(-c(Date), names_to = "index_name", values_to = "index_value") %>%
+  ungroup()
 
 maxDate <- max(temp_tibble$Date, na.rm = T)
 okabe <- c("#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
@@ -330,6 +333,8 @@ ggsave(plot = plot,
 
 # Chloropleth Maps for GRI ----------------------------------------
 
+message("Start G5")
+
 ## import base sf
 world <- ne_countries(scale = "medium",returnclass = "sf")
 
@@ -378,6 +383,8 @@ ggsave(plot = plot,
 
 # Chloropleth Maps for School Responses -----------------------------------
 
+message("Start G6")
+
 ## generating tibble for first cases
 firstcase_tibble <- 
   oxcgrtdata %>%
@@ -387,7 +394,8 @@ firstcase_tibble <-
   filter(round(ConfirmedCases) > 0 & (is.na(lag(ConfirmedCases)) | lag(ConfirmedCases == 0))) %>%
   slice(1) %>%
   select(CountryCode, Date, `C1_School closing`) %>%
-  rename(firstcaseDate = Date)
+  rename(firstcaseDate = Date) %>%
+  ungroup()
 
 ## 
 schoolclosure_tibble <- 
@@ -398,7 +406,8 @@ schoolclosure_tibble <-
   filter(`C1_School closing` > 1 & lag(`C1_School closing` <= 1)) %>%
   slice(1) %>%
   select(CountryCode, Date) %>%
-  rename(schoolclosureDate = Date)
+  rename(schoolclosureDate = Date) %>%
+  ungroup()
   
 temp_tibble <- left_join(firstcase_tibble, schoolclosure_tibble, by = ("CountryCode"))
 
@@ -450,6 +459,8 @@ ggsave(plot = plot,
 
 ## country charts of daily deaths v.s. GRI -------------------------------
 
+message("Start G7")
+
 temp_tibble <- 
   oxcgrtdata %>%
   select(CountryCode, CountryName, Date, ConfirmedDeaths, GovernmentResponseIndexForDisplay) %>%
@@ -459,7 +470,8 @@ temp_tibble <-
          daily_deaths = ifelse(daily_deaths < 0, NA, daily_deaths)) %>%
   fill(daily_deaths, .direction = "down") %>%
   mutate(ave_7day_deaths = zoo::rollmean(daily_deaths, k = 7, fill = NA),
-         log10_dailydeaths = log10(ave_7day_deaths + 1))
+         log10_dailydeaths = log10(ave_7day_deaths + 1)) %>%
+  ungroup()
 
 for(i in unique(temp_tibble$CountryName)){
   #max_logdeaths <- ceiling(max(unique(temp_tibble %>% filter(CountryName == as.symbol(i)) %>% pull(log10_dailydeaths)), na.rm = T))
