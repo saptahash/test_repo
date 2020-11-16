@@ -87,6 +87,8 @@ saveWorkbook(ts_sheet, file = "./data/timeseries/OxCGRT_timeseries_all.xlsx", ov
 
 ## G1 - Government Response Index v/s Cases for 6 countries ================
 
+message("Start G1")
+
 key_countries <- c("CHN", "KOR", "USA", "FRA","GBR", "ITA")
 
 temp_tibble <- 
@@ -130,6 +132,8 @@ ggsave(plot,
       width = 12)
 
 ## 3x2 graph - get 100th case date and then transform to get days since 100th case --------------------
+
+message("Start G2")
 
 temp_tibble <- 
   oxcgrtdata %>%
@@ -192,6 +196,8 @@ ggsave(plot,
        width = 12)  
 
 # Max Government Response level v/s n(covid cases) -------------------------
+
+message("Start G3")
 
 temp_tibble <- 
   oxcgrtdata %>%
