@@ -5,3 +5,4 @@ sudo apt install libgdal-dev
 Rscript -e 'install.packages("remotes")'
 Rscript -e 'remotes::install_cran(c("ellipsis","tidyverse", "devtools", "rgeos", "ggthemes", "zoo","sf", "rnaturalearth", "rnaturalearthdata","here", "scales", "lubridate","writexl","openxlsx","janitor"))'
 Rscript -e 'devtools::install_github("tidyverse/dplyr")'
+Rscript -e 'devtools::install_github("tidyverse/tibble")'
