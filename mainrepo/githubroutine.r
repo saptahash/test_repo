@@ -448,7 +448,8 @@ plot <-
   theme(
     plot.caption = element_text(hjust = 0.5, face = "italic"),
     legend.title = element_text(),
-    legend.background = element_blank()
+    legend.background = element_blank(),
+    plot.margin=grid::unit(c(0,0,0,0), "mm")
     #legend.position = "bottom"
   )
 
@@ -510,11 +511,12 @@ for(i in unique(temp_tibble$CountryName)){
       # Add axis line
       axis.line = element_line(colour = "grey"),
       plot.caption = element_text(hjust = 0.5, face = "italic"),
-      plot.title = element_text(hjust = 0.5))
+      plot.title = element_text(hjust = 0.5),
+      plot.margin=grid::unit(c(0,0,0,0), "mm"))
   ggsave(plot ,
          filename = paste0("./images/country_charts",i, ".png"),
-         width = 10,
-         height = 5)
+         width = 12,
+         height = 8)
     
 }
 
