@@ -3,6 +3,7 @@ library(tidyr)
 library(stringr)
 library(dplyr)
 library(ggplot2)
+library(readr)
 
 url_oxcgrt <- "https://raw.githubusercontent.com/OxCGRT/covid-policy-tracker/master/data/OxCGRT_latest_allchanges.csv"
 
