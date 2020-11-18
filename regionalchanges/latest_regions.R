@@ -1,10 +1,9 @@
-library(lubridate)
-library(tidyr)
-library(stringr)
 library(dplyr)
 library(ggplot2)
-library(readr)
 library(scales)
+library(readr)
+library(tidyr)
+library(lubridate)
 
 url_oxcgrt <- "https://raw.githubusercontent.com/OxCGRT/covid-policy-tracker/master/data/OxCGRT_latest_allchanges.csv"
 
@@ -87,6 +86,7 @@ for(i in region_list){
   total_countries <- length(unique(temp_tibble$CountryCode))
   max_logcases <- ceiling(max(temp_tibble$log10_cases, na.rm = T))
   coeff <- 100/max_logcases
+  maxDate <- max(unique(temp_tibble$Date))
   
   # create graph if only one page is needed i.e. total countries < 32 in region
   if(total_countries < 32){
