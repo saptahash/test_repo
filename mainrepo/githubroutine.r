@@ -517,7 +517,7 @@ for(i in unique(temp_tibble$CountryName)){
       plot.title = element_text(hjust = 0.5),
       plot.margin=grid::unit(c(0,0,0,0), "mm"))
   ggsave(plot ,
-         filename = paste0("./images/country_charts",i, ".png"),
+         filename = paste0("./images/country_charts/",i, ".png"),
          width = 12,
          height = 8)
     
