@@ -108,7 +108,7 @@ oxcgrtdata <- oxcgrtdata %>% mutate(mob = pmin(min_apple, min_google, na.rm = T)
 #  mutate(community_understanding = ifelse(H1_Public.info_1!=2, 0, community_understanding)) 
 
 oxcgrtdata <- oxcgrtdata %>% mutate(community_understanding = (0.5*cases_controlled)*(mob-20)/100) %>%
-    mutate(community_understanding = ifelse(H1_Public.info_1!=2, 0, community_understanding)) 
+    mutate(community_understanding = ifelse(H1_Public.info_1!=2, 1, community_understanding)) 
 
 ##------------------FINAL INDEX--------------------
 
