@@ -2,5 +2,5 @@
 sudo apt-get install libcurl4-openssl-dev
 sudo apt install -y libudunits2-0 libudunits2-dev
 sudo apt install libgdal-dev
-Rscript -e 'install.packages("remotes", "devtools")'
+Rscript -e 'install.packages(c("remotes", "devtools"))'
 Rscript -e 'remotes::install_cran(c("countrycode", "feather", "rgeos", "ggrepel", "ggthemes", "viridis", "tidyverse", "RcppRoll", "zoo", "haven","sf", "rnaturalearth", "rnaturalearthdata", "here"))'
