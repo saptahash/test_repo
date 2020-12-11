@@ -12,8 +12,8 @@ jobs:
                                   r-version: '3.5.3' # The R version to be installed 
                         - name: Install dependencies        
                           run: |
-                             chmod +x oxcgrt/codes/sysrequirements.sh
-                             oxcgrt/codes/sysrequirements.sh
+                             chmod +x mainrepo/sysrequirements.sh
+                             mainrepo/sysrequirements.sh
 #                             sudo apt-get install libcurl4-openssl-dev
 #                             sudo apt install -y libudunits2-0 libudunits2-dev
 #                             sudo apt install libgdal-dev
