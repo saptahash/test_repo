@@ -42,8 +42,11 @@ indicators <- indicators[!indicators %in% c("h4_emergency_investment_in_healthca
                              "e4_international_support",
                              "e3_fiscal_measures")]
 
+## extract cases and deaths
+casedeaths <- names(clean_names(oxcgrtdata)) %>% str_subset(pattern = "cases|deaths")
+
 ## create empty worksheet and write timeseries in each tab
-tslist <- c(indices, indicators)
+tslist <- c(indices, indicators, casedeaths)
 ts_sheet <- createWorkbook()
 
 timeseries <- function(i){
