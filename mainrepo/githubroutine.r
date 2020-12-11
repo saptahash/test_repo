@@ -142,7 +142,7 @@ temp_tibble <-
   select(ConfirmedCases, GovernmentResponseIndexForDisplay, Date, CountryCode, CountryName) %>%
   group_by(CountryCode) %>%
   arrange(CountryCode, Date) %>%
-  mutate(date_100thcase = ifelse(ConfirmedCases >= 100 & lag(ConfirmedCases) < 100, Date, NA),
+  mutate(date_100thcase = ifelse(ConfirmedCases >= 100 & (lag(ConfirmedCases) < 100 | is.na(lag(ConfirmedCases))), Date, NA),
          date_100thcase = ymd(as.Date(date_100thcase)),
          newcases = ConfirmedCases - lag(ConfirmedCases),
          newcases = ifelse(newcases <= 0, NA, newcases)) %>%
