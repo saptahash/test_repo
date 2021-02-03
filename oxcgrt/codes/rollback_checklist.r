@@ -93,7 +93,8 @@ oxcgrtdata <- oxcgrtdata %>% mutate(manage_imported_cases = case_when(C8_Interna
 oxcgrtdata <- oxcgrtdata %>% arrange(CountryCode, Date) %>% group_by(CountryCode) %>% 
   mutate(min_google = roll_min(google_ave, n = 28L, align = "right",fill = NA, na.rm = T), 
          min_apple = roll_min(apple_ave, n = 28L, align = "right", fill = NA, na.rm = T),
-         min_google = ifelse(is.infinite(min_google), NA, min_google)) 
+         min_google = ifelse(is.infinite(min_google), NA, min_google),
+         min_apple = ifelse(is.infinite(min_apple), NA, min_apple)) 
 
 oxcgrtdata <- oxcgrtdata %>% mutate(mob = pmin(min_apple, min_google, na.rm = T), 
                                     mob = case_when(mob < 20 ~ 20,
