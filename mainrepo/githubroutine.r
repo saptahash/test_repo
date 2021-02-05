@@ -209,7 +209,7 @@ temp_tibble <-
   group_by(CountryCode) %>%
   arrange(CountryCode, Date) %>%
   fill(ConfirmedCases, .direction = "down") %>%
-  slice_tail(1) %>%
+  slice_tail(n = 1) %>%
   #summarise(cases = max(ConfirmedCases), 
   #          maxgri = max(GovernmentResponseIndexForDisplay)) %>%
   mutate(log10_cases = log10(ConfirmedCases+1)) %>%
@@ -397,7 +397,7 @@ firstcase_tibble <-
   arrange(CountryCode, Date) %>%
 #  fill(`C1_School closing`, .direction = "down") %>%
   filter(round(ConfirmedCases) > 0 & (is.na(lag(ConfirmedCases)) | lag(ConfirmedCases == 0))) %>%
-  slice(1) %>%
+  slice(n = 1) %>%
   select(CountryCode, Date, `C1_School closing`) %>%
   rename(firstcaseDate = Date) %>%
   ungroup()
@@ -409,7 +409,7 @@ schoolclosure_tibble <-
   arrange(CountryCode, Date) %>%
   fill(`C1_School closing`, .direction = "down") %>%
   filter(`C1_School closing` > 1 & lag(`C1_School closing` <= 1)) %>%
-  slice(1) %>%
+  slice(n = 1) %>%
   select(CountryCode, Date) %>%
   rename(schoolclosureDate = Date) %>%
   ungroup()
