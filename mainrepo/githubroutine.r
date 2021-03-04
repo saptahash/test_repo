@@ -18,7 +18,9 @@ oxcgrtdata <- read_csv("https://raw.githubusercontent.com/OxCGRT/covid-policy-tr
                        col_types = cols(RegionName = col_character(), 
                                         RegionCode = col_character()))
 
-oxcgrtdata <- oxcgrtdata %>% filter(is.na(RegionName))
+oxcgrtUS <- oxcgrtdata[oxcgrtdata$CountryCode == "USA" & !is.na(oxcgrtdata$RegionName),]
+
+#oxcgrtdata <- oxcgrtdata %>% filter(is.na(RegionName))
 
 oxcgrtdata <- 
   oxcgrtdata %>% 
@@ -27,6 +29,14 @@ oxcgrtdata <-
   filter(Date != Sys.Date()) %>%
   group_by(CountryCode) %>%
   arrange(CountryCode, Date) %>%
+  fill(ConfirmedCases, GovernmentResponseIndex, .direction = "down")
+
+oxcgrtUS <- 
+  oxcgrtUS %>% 
+  mutate(Date = ymd(Date)) %>%
+  filter(Date != Sys.Date()) %>%
+  group_by(RegionCode) %>%
+  arrange(RegionCode, Date) %>%
   fill(ConfirmedCases, GovernmentResponseIndex, .direction = "down")
 
 # get a time series for each index and indicator ------------------------------------- 
@@ -524,6 +534,68 @@ for(i in unique(temp_tibble$CountryName)){
          width = 12,
          height = 8)
     
+}
+
+## US state charts of daily deaths v.s. GRI -------------------------------
+
+message("Start G8")
+
+temp_tibble <- 
+  oxcgrtUS %>%
+  select(RegionCode, RegionName, Date, ConfirmedDeaths, GovernmentResponseIndexForDisplay) %>%
+  group_by(RegionCode) %>%
+  arrange(RegionCode, Date) %>%
+  mutate(daily_deaths = ConfirmedDeaths - lag(ConfirmedDeaths),
+         daily_deaths = ifelse(daily_deaths < 0, NA, daily_deaths)) %>%
+  fill(daily_deaths, .direction = "down") %>%
+  mutate(ave_7day_deaths = zoo::rollmean(daily_deaths, k = 7, fill = NA),
+         log10_dailydeaths = log10(ave_7day_deaths + 1)) %>%
+  ungroup()
+
+for(i in unique(temp_tibble$RegionName)){
+  #max_logdeaths <- ceiling(max(unique(temp_tibble %>% filter(CountryName == as.symbol(i)) %>% pull(log10_dailydeaths)), na.rm = T))
+  max_logdeaths <- 4
+  coeff <- 100/max_logdeaths
+  maxDate <- max(temp_tibble$Date, na.rm = T)
+  plot <- 
+    ggplot(data = temp_tibble %>% filter(RegionName == as.symbol(i)), aes(x = Date)) + 
+    geom_line(aes(y = log10_dailydeaths), colour = "purple", size = 0.8) + 
+    geom_line(aes(y = GovernmentResponseIndexForDisplay/coeff), colour = "red", size = 0.8) +
+    scale_y_continuous(name = "Daily deaths (7 day rolling average)",
+                       breaks = seq(0, max_logdeaths),
+                       labels = comma(do.call(rbind,lapply(seq(0, max_logdeaths), function(x){return(10^x)}))),
+                       sec.axis = sec_axis(~.*coeff,
+                                           name = "Government Response Index",
+                                           breaks = c(0, 20, 40, 60, 80, 100), 
+                                           labels = c(0, 20, 40, 60, 80, 100))) + 
+    expand_limits(y = c(0, max_logdeaths)) + 
+    scale_x_date(breaks = seq.Date(from = ymd(as.Date("2020-01-01")), to = maxDate, by = "1 month"),
+                 date_labels = "%d-%b") +
+    labs(title = paste0(i, "'s Covid-19 Trajectory"),
+         caption = "Source: Oxford COVID-19 Government Response Tracker. More at https://github.com/OxCGRT/covid-policy-tracker 
+       or bsg.ox.ac.uk/covidtracker") +
+    theme(
+      # Remove panel border
+      axis.text.y.right = element_text(colour = "red"),
+      axis.title.y.right = element_text(colour = "red"),
+      axis.text.y.left = element_text(colour = "purple"),
+      axis.title.y.left = element_text(colour = "purple"),
+      panel.border = element_blank(),  
+      # Remove panel grid lines
+      panel.grid.major = element_line(size = 0.5, linetype = "dashed", colour = "grey"),
+      #panel.grid.minor = element_blank(),
+      # Remove panel background
+      panel.background = element_blank(),
+      # Add axis line
+      axis.line = element_line(colour = "grey"),
+      plot.caption = element_text(hjust = 0.5, face = "italic"),
+      plot.title = element_text(hjust = 0.5),
+      plot.margin=grid::unit(c(0,0,0,0), "mm"))
+  ggsave(plot ,
+         filename = paste0("./images/US_states/",i, ".png"),
+         width = 12,
+         height = 8)
+  
 }
 
 
