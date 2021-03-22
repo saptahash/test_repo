@@ -221,20 +221,20 @@ oxcgrtdata <- oxcgrtdata %>% mutate(test_percase = ifelse((ConfirmedCases > 0) &
 
 
 ########### using additional data to qualify gaps in testing data 
-testing_data2_url <- "https://drive.google.com/uc?id=13yev97Ua-E-EslhDIX9vQiC2OZIqgGX4&export=download"
-testing.data2 <- read.csv(url(testing_data2_url), stringsAsFactors = FALSE)
+## OWID has decommisioned the no-testing-data CSV, setting `test_nodata` to NA for now
+#testing_data2_url <- "https://drive.google.com/uc?id=13yev97Ua-E-EslhDIX9vQiC2OZIqgGX4&export=download"
+#testing.data2 <- read.csv(url(testing_data2_url), stringsAsFactors = FALSE)
 
-testing.data2 <- testing.data2 %>% mutate(test_nodata = ifelse(observations_found == 0, 1, NA)) 
+#testing.data2 <- testing.data2 %>% mutate(test_nodata = ifelse(observations_found == 0, 1, NA)) 
 
-no.testing.data <- testing.data2 %>% filter(test_nodata == 1)
-no.testing.data.ccode <- countrycode(no.testing.data$country, origin = "country.name", destination = "iso3c")
-no.testing.data <- no.testing.data %>% mutate(countrycode = no.testing.data.ccode)
+#no.testing.data <- testing.data2 %>% filter(test_nodata == 1)
+#no.testing.data.ccode <- countrycode(no.testing.data$country, origin = "country.name", destination = "iso3c")
+#no.testing.data <- no.testing.data %>% mutate(countrycode = no.testing.data.ccode)
 #note Micronesia isn't matched
 
-oxcgrtdata <- left_join(oxcgrtdata, no.testing.data %>% select(countrycode, test_nodata), by = c("CountryCode" = "countrycode"))
-
+#oxcgrtdata <- left_join(oxcgrtdata, no.testing.data %>% select(countrycode, test_nodata), by = c("CountryCode" = "countrycode"))
+oxcgrtdata$test_nodata <- NA
 write.csv(oxcgrtdata, file = paste("./data/input/OxCGRT_", data_date, ".csv", sep = ""))  
-
 
 
 
