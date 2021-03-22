@@ -12,8 +12,9 @@ library(countrycode)
 library(zoo)
 
 #pwd <<- "C:\Users\sapta\OneDrive\Desktop\oxcgrtRA\BSGtracker_analysis\codes"
+message("importing oxcgrtdata")
 data_date <<- today()
-url_oxcgrt <<- "https://raw.githubusercontent.com/OxCGRT/covid-policy-tracker/master/data/OxCGRT_latest_withnotes.csv"
+url_oxcgrt <<- "https://raw.githubusercontent.com/OxCGRT/covid-policy-tracker/master/data/OxCGRT_latest.csv"
 
 #setwd(pwd)
 oxcgrtdata <- read_csv(url(url_oxcgrt), col_types = cols(RegionName = col_character(), 
@@ -27,6 +28,7 @@ correlates <- c("popWB",  "hosp_beds_WB", "total_sars", "sars_deaths",
                 "total_mers", "h1n1_death_estimate_25pctile",
                 "h1n1_death_estimate_75pctile", "pop_in_cities")
 
+message("importing crossnational data")
 crossnationaldata <- read_dta("./data/input/crossnationaldata.dta") #note - new version stata file
 
 correlatesdata <- crossnationaldata %>% select(countrycode, popWB, hosp_beds_WB,
@@ -71,6 +73,7 @@ for(reg in region_list){
 
 ##   Bringing in Apple and Google Mobility Data
 
+message("importing google mobility data")
 url_gmobility <- "https://www.gstatic.com/covid19/mobility/Global_Mobility_Report.csv"
 
 google.mobility <- read_csv(url(url_gmobility), col_types = cols(sub_region_1 = col_character(), 
@@ -104,6 +107,7 @@ google.mobility <- google.mobility %>% filter(is.na(sub_region_1) & is.na(sub_re
 
 # Import Apple Mobility Data
 
+message("importing apple mobility data")
 apple.mobility.url <- "https://raw.githubusercontent.com/ActiveConclusion/COVID19_mobility/master/apple_reports/applemobilitytrends.csv"
 apple.mobility <- read.csv(url(apple.mobility.url))
 
@@ -192,6 +196,7 @@ oxcgrtdata <- oxcgrtdata %>% ungroup() %>%
 
 #Bringing in OWID Testing Data
 
+message("importing OWID testing data")
 owid_url <- "https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/testing/covid-testing-all-observations.csv"
 owid.data <- read.csv(url(owid_url), stringsAsFactors = FALSE)
 
