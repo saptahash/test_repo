@@ -7,7 +7,8 @@ library(lubridate)
 
 url_oxcgrt <- "https://raw.githubusercontent.com/OxCGRT/covid-policy-tracker/master/data/OxCGRT_latest_allchanges.csv"
 
-oxcgrtdata <- read_csv(url(url_oxcgrt))
+oxcgrtdata <- read_csv(url(url_oxcgrt),
+                      locale = readr::locale(encoding = "Latin1"))
 
 # define WB regions ----------------------------------------------
 East_Asia_Pacific <- c("ASM", "AUS", "BRN", "CHN", "FJI", "FSM", "GUM", "HKG", "IDN", "JPN", "KHM", "KIR", "KOR", "LAO", "MAC", "MHL", "MMR", "MNG", "MNP", "MYS", "NCL", "NRU", "NZL", "PHL", "PLW", "PNG", "PRK", "PYF", "SGP", "SLB", "THA", "TLS", "TON", "TUV", "TWN", "VNM", "VUT", "WSM")
