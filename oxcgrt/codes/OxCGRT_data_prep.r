@@ -115,9 +115,9 @@ google.mobility <- google.mobility %>% filter(is.na(sub_region_1) & is.na(sub_re
 
 message("importing apple mobility data")
 apple.mobility.url <- "https://raw.githubusercontent.com/ActiveConclusion/COVID19_mobility/master/apple_reports/applemobilitytrends.csv"
-#apple.mobility <- read.csv(url(apple.mobility.url))
-apple.mobility <- fread(apple.mobility.url)
-apple.mobility <- as.data.frame(apple.mobility)
+apple.mobility <- read.csv(url(apple.mobility.url))
+#apple.mobility <- fread(apple.mobility.url)
+#apple.mobility <- as.data.frame(apple.mobility)
 
 apple.mobility <- apple.mobility %>% filter(!(geo_type == "city" | 
                             geo_type == "county" | 
