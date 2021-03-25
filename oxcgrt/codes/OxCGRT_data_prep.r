@@ -22,7 +22,7 @@ url_oxcgrt <<- "https://raw.githubusercontent.com/OxCGRT/covid-policy-tracker/ma
 #                                                         RegionCode = col_character()))
 #notes - save backup at this point 
 #subset only national data 
-oxcgrtdata <- fread(url_oxcgrt)
+oxcgrtdata <- fread(url_oxcgrt, colClasses = list(character = c("RegionName", "RegionCode")))
 oxcgrtdata <- as.data.frame(oxcgrtdata)
 oxcgrtdata <- oxcgrtdata %>% filter(RegionName == "")
 
@@ -79,9 +79,12 @@ for(reg in region_list){
 message("importing google mobility data")
 url_gmobility <- "https://www.gstatic.com/covid19/mobility/Global_Mobility_Report.csv"
 
-google.mobility <- read_csv(url(url_gmobility), col_types = cols(sub_region_1 = col_character(), 
-                                                                 sub_region_2 = col_character(), 
-                                                                 metro_area = col_character()))
+google.mobility <- fread(url_gmobility, colClasses = list(character = c("sub_region_1", "sub_region_2", "metro_area")))
+google.mobility <- as.data.frame(google.mobility)
+
+#google.mobility <- read_csv(url(url_gmobility), col_types = cols(sub_region_1 = col_character(), 
+#                                                                 sub_region_2 = col_character(), 
+#                                                                 metro_area = col_character()))
 # BUG - column parsing isn't correct - metro_area isn't being read as text
 # Stata diff: Date already stored as date - no need to change
 
@@ -112,7 +115,9 @@ google.mobility <- google.mobility %>% filter(is.na(sub_region_1) & is.na(sub_re
 
 message("importing apple mobility data")
 apple.mobility.url <- "https://raw.githubusercontent.com/ActiveConclusion/COVID19_mobility/master/apple_reports/applemobilitytrends.csv"
-apple.mobility <- read.csv(url(apple.mobility.url))
+#apple.mobility <- read.csv(url(apple.mobility.url))
+apple.mobility <- fread(apple.mobility.url)
+apple.mobility <- as.data.frame(apple.mobility)
 
 apple.mobility <- apple.mobility %>% filter(!(geo_type == "city" | 
                             geo_type == "county" | 
