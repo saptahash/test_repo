@@ -10,6 +10,7 @@ library(tidyverse)
 library(lubridate)
 library(countrycode)
 library(zoo)
+library(data.table)
 
 #pwd <<- "C:\Users\sapta\OneDrive\Desktop\oxcgrtRA\BSGtracker_analysis\codes"
 message("importing oxcgrtdata")
@@ -17,11 +18,13 @@ data_date <<- today()
 url_oxcgrt <<- "https://raw.githubusercontent.com/OxCGRT/covid-policy-tracker/master/data/OxCGRT_latest.csv"
 
 #setwd(pwd)
-oxcgrtdata <- read_csv(url(url_oxcgrt), col_types = cols(RegionName = col_character(), 
-                                                         RegionCode = col_character()))
+#oxcgrtdata <- read_csv(url(url_oxcgrt), col_types = cols(RegionName = col_character(), 
+#                                                         RegionCode = col_character()))
 #notes - save backup at this point 
 #subset only national data 
-oxcgrtdata <- oxcgrtdata %>% filter(is.na(RegionName))
+oxcgrtdata <- fread(url_oxcgrt)
+oxcgrtdata <- as.data.frame(oxcgrtdata)
+oxcgrtdata <- oxcgrtdata %>% filter(RegionName == "")
 
 #Step 2: Bringing in crossnational correlates
 correlates <- c("popWB",  "hosp_beds_WB", "total_sars", "sars_deaths",
