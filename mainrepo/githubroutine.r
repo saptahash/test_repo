@@ -238,7 +238,7 @@ plot <-
   scale_x_continuous(name = "Reported number of COVID-19 cases",
                      breaks = c(0, 1, 2, 3, 4, 5, 6, 7),
                      labels = c("1", "10", "100", "1,000", "10,000", "100,000", "1,000,000", "10,000,000")) + 
-  scale_y_continuous(name = "Maximum Government Response Index level",
+  scale_y_continuous(name = "Government Response Index level",
                      breaks = c(0, 20, 40, 60, 80, 100)) + 
   labs(caption = "Source: Oxford COVID-19 Government Response Tracker. More at https://github.com/OxCGRT/covid-policy-tracker 
        or bsg.ox.ac.uk/covidtracker") +
